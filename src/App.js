@@ -8,6 +8,7 @@ import './App.scss';
 class App extends Component {
   state = {
     imageUrl: sunset,
+    color: null,
   };
 
   render() {
@@ -21,13 +22,15 @@ class App extends Component {
           Change Image!
         </Button>
         <ImageCanvas colorSelected={(hex) => this.handleColorSelected(hex)} imageUrl={this.state.imageUrl}></ImageCanvas>
+        <ColorPalette color={this.state.color}></ColorPalette>
       </div>
     );
   }
 
   handleColorSelected(hex) {
-    // Note: Not actually hex yet :)
     console.log(hex);
+    // Update the color palette.
+    this.setState({color: hex});
   }
 }
 
@@ -50,15 +53,10 @@ class ImageCanvas extends Component {
     }
   }
 
-  getCanvasCtx() {
-    const canvasElement = this.canvasElement.current;
-    return canvasElement.getContext('2d');
-  }
-
   updateImage() {
     const canvasElement = this.canvasElement.current;
     const {imageUrl} = this.props;
-    const ctx = this.getCanvasCtx();
+    const ctx = canvasElement.getContext('2d');
     const image = new Image();
     image.onload = () => {
       ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -68,10 +66,14 @@ class ImageCanvas extends Component {
   }
 
   handleClick(e) {
-    const ctx = this.getCanvasCtx();
+    const canvasElement = this.canvasElement.current;
+    const ctx = canvasElement.getContext('2d');
+    
+    const rect = canvasElement.getBoundingClientRect();
 
-    const x = e.clientX;
-    const y = e.clientY;
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
     const pixel = ctx.getImageData(x, y, 1, 1).data;
 
     console.log(pixel);
@@ -80,19 +82,37 @@ class ImageCanvas extends Component {
 
   render() {
     return (
-      <canvas onClick={(e) => this.handleClick(e)} ref={this.canvasElement} width={1000} height={1000}/>
+      <canvas onClick={(e) => this.handleClick(e)} ref={this.canvasElement} width={1000} height={600}/>
+    );
+  }
+}
+
+class ColorPalette extends Component {
+  colorSwabEl = React.createRef();
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.color !== this.props.color) {
+      this.updateColor();
+    }
+  }
+
+  updateColor() {
+    // Temporarily just update one default color swab.
+    const colorSwabEl = this.colorSwabEl.current;
+    colorSwabEl.style.backgroundColor = this.props.color;
+  }
+
+  render() {
+    return (
+      <div className="color-palette-container">
+        <div ref={this.colorSwabEl} className="color-swab"></div>
+      </div>
     );
   }
 }
 
 function rgbToHex(imageData) {
-  let hexStr = '#';
-  for (let i = 0; i < imageData.length - 1; i++) {
-    let hexVal = imageData[i].toString(16);
-    hexVal = hexVal.length === 1 ? '0' + hexVal : hexVal;
-    hexStr += hexVal;
-  }
-  return hexStr;
+  return '#' + ((imageData[0] << 16) | (imageData[1] << 8) | imageData[2]).toString(16);
 }
 
 export default App;
