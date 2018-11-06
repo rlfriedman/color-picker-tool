@@ -9,6 +9,7 @@ class App extends Component {
   state = {
     imageUrl: sunset,
     color: null,
+    hex: null,
   };
 
   render() {
@@ -22,15 +23,15 @@ class App extends Component {
           Change Image!
         </Button>
         <ImageCanvas colorSelected={(hex) => this.handleColorSelected(hex)} imageUrl={this.state.imageUrl}></ImageCanvas>
-        <ColorPalette color={this.state.color}></ColorPalette>
+        <ColorPalette hex={this.state.hex} color={this.state.color}></ColorPalette>
       </div>
     );
   }
 
-  handleColorSelected(hex) {
-    console.log(hex);
+  handleColorSelected(pixel) {
+    const hex = rgbToHex(pixel);
     // Update the color palette.
-    this.setState({color: hex});
+    this.setState({hex: hex, color: pixel});
   }
 }
 
@@ -77,7 +78,7 @@ class ImageCanvas extends Component {
     const pixel = ctx.getImageData(x, y, 1, 1).data;
 
     console.log(pixel);
-    this.props.colorSelected(rgbToHex(pixel));
+    this.props.colorSelected(pixel);
   }
 
   render() {
@@ -91,7 +92,7 @@ class ColorPalette extends Component {
   colorSwabEl = React.createRef();
 
   componentDidUpdate(prevProps) {
-    if (prevProps.color !== this.props.color) {
+    if (prevProps.hex !== this.props.hex) {
       this.updateColor();
     }
   }
@@ -99,13 +100,27 @@ class ColorPalette extends Component {
   updateColor() {
     // Temporarily just update one default color swab.
     const colorSwabEl = this.colorSwabEl.current;
-    colorSwabEl.style.backgroundColor = this.props.color;
+    colorSwabEl.style.backgroundColor = this.props.hex;
+
+    const textColor = this.decideTextColor(this.props.color);
+    colorSwabEl.style.color = textColor;
+  }
+
+  // Decides what the text color should be based on how dark the background is.
+  decideTextColor(backgroundColor) {
+    const r = backgroundColor[0];
+    const g = backgroundColor[1];
+    const b = backgroundColor[2];
+
+    return (r * 0.299 + g * 0.587 + b * 0.114 > 150) ? '#000000' : '#ffffff';
   }
 
   render() {
     return (
       <div className="color-palette-container">
-        <div ref={this.colorSwabEl} className="color-swab"></div>
+        <div ref={this.colorSwabEl} className="color-swab">
+          {this.props.hex ? this.props.hex : 'Click the image'}
+        </div>
       </div>
     );
   }
