@@ -4,7 +4,6 @@ import sunset from './images/sunset.jpg';
 import logo from './logo.svg';
 
 import './App.scss';
-// add the appropriate line(s) in Step 3a if you are using compiled CSS instead.
 
 class App extends Component {
   state = {
@@ -76,7 +75,7 @@ class ImageCanvas extends Component {
     const pixel = ctx.getImageData(x, y, 1, 1).data;
 
     console.log(pixel);
-    this.props.colorSelected(pixel);
+    this.props.colorSelected(rgbToHex(pixel));
   }
 
   render() {
@@ -84,6 +83,16 @@ class ImageCanvas extends Component {
       <canvas onClick={(e) => this.handleClick(e)} ref={this.canvasElement} width={1000} height={1000}/>
     );
   }
+}
+
+function rgbToHex(imageData) {
+  let hexStr = '#';
+  for (let i = 0; i < imageData.length - 1; i++) {
+    let hexVal = imageData[i].toString(16);
+    hexVal = hexVal.length === 1 ? '0' + hexVal : hexVal;
+    hexStr += hexVal;
+  }
+  return hexStr;
 }
 
 export default App;
