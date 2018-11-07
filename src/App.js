@@ -101,10 +101,19 @@ class ImageCanvas extends Component {
     const image = new Image();
     image.onload = () => {
       ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-      ctx.drawImage(image, 0, 0);
+
+      const {
+        offsetX,
+        offsetY,
+        width,
+        height,
+      } = resizeImageToFitCanvas(image, canvasElement);
+      
+      ctx.drawImage(image, offsetX, offsetY, width, height);  
     }
     image.src = imageUrl;
   }
+
 
   handleClick(e) {
     const pixel = this.getColorFromMouseEvent(e);
@@ -230,6 +239,32 @@ class ColorSwab extends Component {
 
 function rgbToHex(imageData) {
   return '#' + ((imageData[0] << 16) | (imageData[1] << 8) | imageData[2]).toString(16);
+}
+
+function resizeImageToFitCanvas(image, canvas) {
+  const parentWidth = canvas.width;
+  const parentHeight = canvas.height;
+  const childWidth = image.width;
+  const childHeight = image.height;
+  const offsetX = 0.5;
+  const offsetY = 0.5;
+
+  const childRatio = childWidth / childHeight
+  const parentRatio = parentWidth / parentHeight
+  let width = parentWidth;
+  let height = parentHeight;
+
+  if (childRatio < parentRatio) {
+    height = width / childRatio;
+  } else {
+    width = height * childRatio;
+  }
+  return {
+    width,
+    height,
+    offsetX: (parentWidth - width) * offsetX,
+    offsetY: (parentHeight - height) * offsetY
+  }
 }
 
 export default App;
