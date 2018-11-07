@@ -38,16 +38,31 @@
 .color-swab {
   width: 200px;
   height: 200px;
-  border: solid black;
-  color: black;
+  //border: solid black;
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-right: 10px;
+}
+
+.color-swab-text {
   font-family: Roboto,sans-serif;
   font-weight: 500;
   font-size: 16px;
+  color: black;
+  //opacity: 0;
+  //transition: opacity 0.3s;
+}
+
+.color-swab:hover .color-swab-text {
+  opacity: 1;
 }
 
 .color-palette-container {
-  margin: 10px;
+  margin-top: 10px;
+  display: flex;
+}
+
+.app-container {
+  margin: 20px;
 }

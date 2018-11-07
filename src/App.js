@@ -10,11 +10,16 @@ class App extends Component {
     imageUrl: sunset,
     color: null,
     hex: null,
+    tempHex: null,
+    currentSwab: 0,
+    totalSwabs: 1,
+    maxSwabs: 5,
+    isActive: true,
   };
 
   render() {
     return (
-      <div>
+      <div className="app-container">
         <Button
           raised
           className='button-alternate'
@@ -22,27 +27,62 @@ class App extends Component {
         >
           Change Image!
         </Button>
-        <ImageCanvas colorSelected={(hex) => this.handleColorSelected(hex)} imageUrl={this.state.imageUrl}></ImageCanvas>
-        <ColorPalette hex={this.state.hex} color={this.state.color}></ColorPalette>
+        <ImageCanvas colorMove={(pixel) => this.handleColorMove(pixel)}
+                     colorSelected={(hex) => this.handleColorSelected(hex)} 
+                     imageUrl={this.state.imageUrl}>
+        </ImageCanvas>
+        <ColorPalette currentSwab={this.state.currentSwab}
+                      tempHex={this.state.tempHex} 
+                      hex={this.state.hex} 
+                      color={this.state.color} 
+                      maxSwabs={this.state.maxSwabs}
+                      handleSwabClick={(swabIndex) => this.handleSwabClick(swabIndex)}>
+        </ColorPalette>
       </div>
     );
   }
 
-  handleColorSelected(pixel) {
+  handleColorMove(pixel) {
+    if (!this.state.isActive) {
+      return;
+    }
     const hex = rgbToHex(pixel);
-    // Update the color palette.
-    this.setState({hex: hex, color: pixel});
+    this.setState({tempHex: hex, color: null});  
+  }
+
+  handleColorSelected(pixel) {
+    if (!this.state.isActive) {
+      return;
+    }
+    const hex = rgbToHex(pixel);
+    // Consider what to do here. This will cause a new swab to be added
+    // if resetting a different swab's color. Potentially should
+    // remove 'unset' swabs when clicking on another to change it.
+    const activeSwab = this.state.totalSwabs;
+
+    // Only increment the active swab to add a new one if not at the max number.
+    if (this.state.totalSwabs === this.state.maxSwabs) {
+      this.setState({isActive: false});
+      return;
+    }
+
+    this.setState({hex: hex, 
+                  color: pixel, 
+                  currentSwab: activeSwab,
+                  totalSwabs: activeSwab + 1 > this.state.totalSwabs ? activeSwab + 1 : this.state.totalSwabs});
+  }
+
+  handleSwabClick(index) {
+    this.setState({currentSwab: index, isActive: true});
+  }
+
+  handleSwabAdded() {
+    this.setState({totalSwabs: this.state.totalSwabs + 1});
   }
 }
 
 class ImageCanvas extends Component {
   canvasElement = React.createRef();
-  // constructor(props) {
-  //   super(props);
-  //   this.state = {
-  //     imageUrl: props.imageUrl,
-  //   };
-  // }
 
   componentDidMount() {
     this.updateImage();
@@ -67,6 +107,16 @@ class ImageCanvas extends Component {
   }
 
   handleClick(e) {
+    const pixel = this.getColorFromMouseEvent(e);
+    this.props.colorSelected(pixel);
+  }
+
+  handleMouseMove(e) {
+    const pixel = this.getColorFromMouseEvent(e);
+    this.props.colorMove(pixel);
+  }
+
+  getColorFromMouseEvent(e) {
     const canvasElement = this.canvasElement.current;
     const ctx = canvasElement.getContext('2d');
     
@@ -75,21 +125,72 @@ class ImageCanvas extends Component {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const pixel = ctx.getImageData(x, y, 1, 1).data;
-
-    console.log(pixel);
-    this.props.colorSelected(pixel);
+    return ctx.getImageData(x, y, 1, 1).data;
   }
 
   render() {
     return (
-      <canvas onClick={(e) => this.handleClick(e)} ref={this.canvasElement} width={1000} height={600}/>
+      <canvas onMouseMove={(e) => this.handleMouseMove(e)}
+              onClick={(e) => this.handleClick(e)} 
+              ref={this.canvasElement} 
+              width={1000} height={400}/>
     );
   }
 }
 
 class ColorPalette extends Component {
   colorSwabEl = React.createRef();
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      colorSwabs: ["#F5F5F5"],
+    };
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.hex !== this.props.hex) {
+      this.updateColor();
+    }
+    if (prevProps.tempHex !== this.props.tempHex) {
+      this.updateColor(true);
+    }
+  }
+
+  updateColor(temp) {
+    const swabs = this.state.colorSwabs.slice();
+    swabs[this.props.currentSwab] = temp ? this.props.tempHex : this.props.hex;
+    this.setState({colorSwabs: swabs});
+  }
+
+  renderSwab() {
+    const swabs = this.state.colorSwabs.slice();
+    swabs.push(<ColorSwab hex={this.props.hex} key={this.state.colorSwabs.length} />);
+    this.setState({colorSwabs: swabs});
+  }
+
+  render() {
+    const swabs = [];
+    for (let i = 0; i < this.state.colorSwabs.length; i++) {
+      swabs.push(<ColorSwab hex={this.state.colorSwabs[i]} key={i} id={i} handleSwabClick={(swabIndex) => this.props.handleSwabClick(swabIndex)} />);
+    }
+    return (
+      <div className="color-palette-container">
+        {swabs}
+      </div>
+    );
+  }
+}
+
+class ColorSwab extends Component {
+  colorSwabEl = React.createRef();
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      hasSetColor: false,
+    };
+  }
 
   componentDidUpdate(prevProps) {
     if (prevProps.hex !== this.props.hex) {
@@ -98,12 +199,11 @@ class ColorPalette extends Component {
   }
 
   updateColor() {
-    // Temporarily just update one default color swab.
     const colorSwabEl = this.colorSwabEl.current;
     colorSwabEl.style.backgroundColor = this.props.hex;
 
-    const textColor = this.decideTextColor(this.props.color);
-    colorSwabEl.style.color = textColor;
+    //const textColor = this.decideTextColor(this.props.color);
+    //colorSwabEl.style.color = textColor;
   }
 
   // Decides what the text color should be based on how dark the background is.
@@ -117,10 +217,12 @@ class ColorPalette extends Component {
 
   render() {
     return (
-      <div className="color-palette-container">
-        <div ref={this.colorSwabEl} className="color-swab">
-          {this.props.hex ? this.props.hex : 'Click the image'}
-        </div>
+      <div ref={this.colorSwabEl} className="color-swab"
+           onClick={() => this.props.handleSwabClick(this.props.id)}>
+        <span className="color-swab-text">
+          {/* {this.state.hasSetColor ? this.props.hex : ''}
+          {this.props.hex ? '' : 'Select'} */}
+        </span>
       </div>
     );
   }
