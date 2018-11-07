@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import Button from '@material/react-button';
 import sunset from './images/sunset.jpg';
 import logo from './logo.svg';
+import withRipple from '@material/react-ripple';
 
 import './App.scss';
 
@@ -20,24 +21,26 @@ class App extends Component {
   render() {
     return (
       <div className="app-container">
-        <Button
+{/*         <Button
           raised
           className='button-alternate'
           onClick={() => this.setState({imageUrl: logo})}
         >
           Change Image!
-        </Button>
-        <ImageCanvas colorMove={(pixel) => this.handleColorMove(pixel)}
-                     colorSelected={(hex) => this.handleColorSelected(hex)} 
-                     imageUrl={this.state.imageUrl}>
-        </ImageCanvas>
-        <ColorPalette currentSwab={this.state.currentSwab}
-                      tempHex={this.state.tempHex} 
-                      hex={this.state.hex} 
-                      color={this.state.color} 
-                      maxSwabs={this.state.maxSwabs}
-                      handleSwabClick={(swabIndex) => this.handleSwabClick(swabIndex)}>
-        </ColorPalette>
+        </Button> */}
+        <div className="color-tool-container">
+          <ImageCanvas colorMove={(pixel) => this.handleColorMove(pixel)}
+                      colorSelected={(hex) => this.handleColorSelected(hex)} 
+                      imageUrl={this.state.imageUrl}>
+          </ImageCanvas>
+          <ColorPalette currentSwab={this.state.currentSwab}
+                        tempHex={this.state.tempHex} 
+                        hex={this.state.hex} 
+                        color={this.state.color} 
+                        maxSwabs={this.state.maxSwabs}
+                        handleSwabClick={(swabIndex) => this.handleSwabClick(swabIndex)}>
+          </ColorPalette>
+        </div>
       </div>
     );
   }
@@ -108,7 +111,7 @@ class ImageCanvas extends Component {
         width,
         height,
       } = resizeImageToFitCanvas(image, canvasElement);
-      
+
       ctx.drawImage(image, offsetX, offsetY, width, height);  
     }
     image.src = imageUrl;
@@ -142,7 +145,7 @@ class ImageCanvas extends Component {
       <canvas onMouseMove={(e) => this.handleMouseMove(e)}
               onClick={(e) => this.handleClick(e)} 
               ref={this.canvasElement} 
-              width={1000} height={400}/>
+              width={800} height={400}/>
     );
   }
 }
@@ -174,14 +177,14 @@ class ColorPalette extends Component {
 
   renderSwab() {
     const swabs = this.state.colorSwabs.slice();
-    swabs.push(<ColorSwab hex={this.props.hex} key={this.state.colorSwabs.length} />);
+    swabs.push(<RippleColorSwab hex={this.props.hex} key={this.state.colorSwabs.length} />);
     this.setState({colorSwabs: swabs});
   }
 
   render() {
     const swabs = [];
     for (let i = 0; i < this.state.colorSwabs.length; i++) {
-      swabs.push(<ColorSwab hex={this.state.colorSwabs[i]} key={i} id={i} handleSwabClick={(swabIndex) => this.props.handleSwabClick(swabIndex)} />);
+      swabs.push(<RippleColorSwab hex={this.state.colorSwabs[i]} key={i} id={i} handleSwabClick={(swabIndex) => this.props.handleSwabClick(swabIndex)} />);
     }
     return (
       <div className="color-palette-container">
@@ -207,6 +210,11 @@ class ColorSwab extends Component {
     }
   }
 
+  componentDidMount() {
+    console.log(this.colorSwabEl.current);
+    this.props.initRipple(this.colorSwabEl.current);
+  }
+
   updateColor() {
     const colorSwabEl = this.colorSwabEl.current;
     colorSwabEl.style.backgroundColor = this.props.hex;
@@ -225,9 +233,24 @@ class ColorSwab extends Component {
   }
 
   render() {
+    const {
+      className = '',
+      // You must call `initRipple` from the root element's ref. This attaches the ripple
+      // to the element.
+      initRipple,
+      // include `unbounded` to remove warnings when passing `otherProps` to the
+      // root element.
+      unbounded,
+      handleSwabClick,
+      ...otherProps
+    } = this.props;
+
+    const classes = `color-swab ${className}`;
+
     return (
-      <div ref={this.colorSwabEl} className="color-swab"
-           onClick={() => this.props.handleSwabClick(this.props.id)}>
+      <div ref={this.colorSwabEl} className={classes}
+           onClick={() => this.props.handleSwabClick(this.props.id)}
+           {...otherProps}>
         <span className="color-swab-text">
           {/* {this.state.hasSetColor ? this.props.hex : ''}
           {this.props.hex ? '' : 'Select'} */}
@@ -236,6 +259,8 @@ class ColorSwab extends Component {
     );
   }
 }
+
+const RippleColorSwab = withRipple(ColorSwab);
 
 function rgbToHex(imageData) {
   return '#' + ((imageData[0] << 16) | (imageData[1] << 8) | imageData[2]).toString(16);

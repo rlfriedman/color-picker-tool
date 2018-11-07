@@ -1,5 +1,7 @@
 
 @import "@material/react-button/index.scss";
+@import '@material/react-ripple/index.scss';
+
 //@import "./react-button-overrides";
 
 .App {
@@ -38,11 +40,13 @@
 .color-swab {
   width: 200px;
   height: 200px;
-  //border: solid black;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 10px;
+  @include mdc-ripple-surface;
+  @include mdc-ripple-radius-bounded;
+  @include mdc-states;
+  overflow: hidden;
 }
 
 .color-swab-text {
@@ -63,6 +67,14 @@
   display: flex;
 }
 
+.color-palette-container .color-swab:not(:last-child) {
+  margin-right: 10px;
+}
+
 .app-container {
   margin: 20px;
+}
+
+.color-tool-container {
+  width: 800px;
 }
