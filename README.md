@@ -1,3 +1,5 @@
+Made for a hackathon in a short time frame. Try it out at: https://rlfriedman.github.io/color-picker-tool/
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
