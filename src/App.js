@@ -10,6 +10,7 @@ import TextField, {HelperText, Input} from '@material/react-text-field';
 
 import './App.scss';
 import { debug } from 'util';
+import { encode } from 'punycode';
 
 const images = [sunset, flowers, parrots, island];
 
@@ -72,9 +73,59 @@ class App extends Component {
     );
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    // This should not be called always but for now need to to leave the
+    // url after the palette is reset.
+    //if (prevState.imageUrl !== this.state.imageUrl) {
+      this.updateImageUrlParam();
+    //}
+  }
+
+  componentWillMount() {
+    const url = new URL(window.location.href);
+   //debugger;
+    let imageUrl = url.searchParams.get('url');
+    if (imageUrl) {
+      imageUrl = decodeURIComponent(imageUrl);
+      this.setState({imageUrl: imageUrl});
+    }
+
+    const palleteParams = ['p0', 'p1', 'p2', 'p3', 'p4'];
+    const paletteColors = [];
+
+    for (let i = 0; i < palleteParams.length; i++) {
+      const param = palleteParams[i];
+      let color = url.searchParams.get(param);
+      if (color) {
+        color = '#' + color;
+        paletteColors.push(color);
+      }
+    }
+    if (paletteColors.length) {
+      this.setState({colorSwabs: paletteColors,
+        totalSwabs: paletteColors.length,
+        currentSwab: this.state.maxSwabs > paletteColors.length ? paletteColors.length : this.state.maxSwabs - 1,
+        isActive: this.state.maxSwabs !== paletteColors.length,
+        
+      })
+    }
+  }
+
+  updateImageUrlParam() {
+    const url = new URL(window.location.href);
+    url.searchParams.set('url', encodeURIComponent(this.state.imageUrl));
+    window.history.replaceState({path:url.toString()},'', url.toString());
+    const encodedUrl = encodeURIComponent(this.state.imageUrl);
+  }
+
+  addColorToUrl(hex) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('p' + this.state.currentSwab.toString(), hex.substring(1));
+    window.history.replaceState({path:url.toString()},'', url.toString());
+  }
+
   handleInputKeypress(e) {
     if (e.key === 'Enter') {
-      console.log(this.state.textFieldValue);
       this.setState({
         imageUrl: this.state.textFieldValue,
         textFieldValue: '',
@@ -90,6 +141,7 @@ class App extends Component {
       isActive: true,
       colorSwabs: ["empty"],
     });
+    window.history.replaceState(null, null, window.location.pathname);
   }
 
   handleColorMove(pixel) {
@@ -101,7 +153,6 @@ class App extends Component {
   }
 
   handleColorSelected(pixel) {
-    console.log(pixel);
     if (!this.state.isActive) {
       return;
     }
@@ -114,8 +165,10 @@ class App extends Component {
     // Only increment the active swab to add a new one if not at the max number.
     if (this.state.totalSwabs === this.state.maxSwabs) {
       this.setState({isActive: false});
+      this.addColorToUrl(hex);
       return;
     }
+    this.addColorToUrl(hex);
     const newSwabs = this.state.colorSwabs.slice();
     // Add a new swab.
     newSwabs.push('empty');
@@ -240,13 +293,15 @@ class ColorSwab extends Component {
   colorSwabEl = React.createRef();
 
   componentDidUpdate(prevProps) {
-    if (prevProps.hex !== this.props.hex) {
+   // if (prevProps.hex !== this.props.hex) {
       this.updateColor();
-    }
+   // }
+   // if (!prevProps.hex && this.props.hex) {
+     // this.updateColor();
+   // }
   }
 
   componentDidMount() {
-    console.log(this.colorSwabEl.current);
     this.props.initRipple(this.colorSwabEl.current);
   }
 
