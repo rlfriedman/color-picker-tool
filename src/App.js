@@ -15,6 +15,7 @@ const images = [sunset, flowers, parrots, island];
 class App extends Component {
   state = {
     imageUrl: images[0],
+    colorSwabs: ['empty'],
     currentImageIndex: 0,
     color: null,
     hex: null,
@@ -33,7 +34,8 @@ class App extends Component {
                       colorSelected={(hex) => this.handleColorSelected(hex)} 
                       imageUrl={this.state.imageUrl}>
           </ImageCanvas>
-          <ColorPalette currentSwab={this.state.currentSwab}
+          <ColorPalette colorSwabs={this.state.colorSwabs}
+                        currentSwab={this.state.currentSwab}
                         tempHex={this.state.tempHex} 
                         hex={this.state.hex} 
                         color={this.state.color} 
@@ -48,7 +50,7 @@ class App extends Component {
                 imageUrl: images[(this.state.currentImageIndex + 1) % images.length],
                 currentImageIndex: this.state.currentImageIndex + 1,
               });
-              this.clearPalette();
+              this.resetPallete();
             }}>
             Random Image
           </Button>
@@ -57,12 +59,13 @@ class App extends Component {
     );
   }
 
-  clearPalette() {
+  resetPallete() {
     this.setState({
       totalSwabs: 1,
       currentSwab: 0,
       isActive: true,
-    })
+      colorSwabs: ["empty"],
+    });
   }
 
   handleColorMove(pixel) {
@@ -89,19 +92,19 @@ class App extends Component {
       this.setState({isActive: false});
       return;
     }
+    const newSwabs = this.state.colorSwabs.slice();
+    // Add a new swab.
+    newSwabs.push('empty');
 
-    this.setState({hex: hex, 
+    this.setState({hex: 'empty', 
                   color: pixel, 
                   currentSwab: activeSwab,
-                  totalSwabs: activeSwab + 1 > this.state.totalSwabs ? activeSwab + 1 : this.state.totalSwabs});
+                  totalSwabs: activeSwab + 1 > this.state.totalSwabs ? activeSwab + 1 : this.state.totalSwabs,
+                  colorSwabs: newSwabs});
   }
 
   handleSwabClick(index) {
     this.setState({currentSwab: index, isActive: true});
-  }
-
-  handleSwabAdded() {
-    this.setState({totalSwabs: this.state.totalSwabs + 1});
   }
 }
 
@@ -166,7 +169,7 @@ class ImageCanvas extends Component {
       <canvas onMouseMove={(e) => this.handleMouseMove(e)}
               onClick={(e) => this.handleClick(e)} 
               ref={this.canvasElement} 
-              width={800} height={400}/>
+              width={1000} height={600}/>
     );
   }
 }
@@ -191,21 +194,21 @@ class ColorPalette extends Component {
   }
 
   updateColor(temp) {
-    const swabs = this.state.colorSwabs.slice();
-    swabs[this.props.currentSwab] = temp ? this.props.tempHex : this.props.hex;
-    this.setState({colorSwabs: swabs});
+    this.props.colorSwabs[this.props.currentSwab] = temp ? this.props.tempHex : this.props.hex;
   }
-
-  /*renderSwab() {
-    const swabs = this.state.colorSwabs.slice();
-    swabs.push(<RippleColorSwab hex={this.props.hex} key={this.state.colorSwabs.length} />);
-    this.setState({colorSwabs: swabs});
-  } */
 
   render() {
     const swabs = [];
-    for (let i = 0; i < this.state.colorSwabs.length; i++) {
-      swabs.push(<RippleColorSwab hex={this.state.colorSwabs[i]} key={i} id={i} handleSwabClick={(swabIndex) => this.props.handleSwabClick(swabIndex)} />);
+    for (let i = 0; i < this.props.colorSwabs.length; i++) {
+      let hex = '';
+      let empty = false;
+      if (this.props.colorSwabs[i] === 'empty') {
+        hex = '#FFFFFF';
+        empty = true;
+      } else {
+        hex = this.props.colorSwabs[i];
+      }
+      swabs.push(<RippleColorSwab hex={hex} empty={empty} key={i} id={i} handleSwabClick={(swabIndex) => this.props.handleSwabClick(swabIndex)} />);
     }
     return (
       <div className="color-palette-container">
@@ -237,6 +240,11 @@ class ColorSwab extends Component {
     this.props.initRipple(this.colorSwabEl.current);
   }
 
+  componentWillUnmount() {
+    console.log('unmount');
+    this.setState({hasColor: false});
+  }
+
   updateColor() {
     const colorSwabEl = this.colorSwabEl.current;
     // Remove the no-color class when the color has been set.
@@ -264,10 +272,11 @@ class ColorSwab extends Component {
       initRipple,
       unbounded,
       handleSwabClick,
+      empty,
       ...otherProps
     } = this.props;
 
-    const classes = `color-swab ${this.state.hasColor ? '' : 'no-color'} ${className}`;
+    const classes = `color-swab ${this.props.empty ? 'no-color' : ''} ${className}`;
 
     return (
       <div ref={this.colorSwabEl} className={classes}
