@@ -58,6 +58,15 @@ class App extends Component {
               }}>
               Random Image
             </Button>
+            <Button
+              outlined
+              className='random-image-button'
+              onClick={() => {
+                // Probably only works in latest versions of Chrome
+                navigator.clipboard.writeText(window.location.href);
+              }}>
+              Copy URL
+            </Button>
             <TextField
               outlined
               label='Update Image URL'
@@ -248,7 +257,7 @@ class ImageCanvas extends Component {
       <canvas onMouseMove={(e) => this.handleMouseMove(e)}
               onClick={(e) => this.handleClick(e)} 
               ref={this.canvasElement} 
-              width={1000} height={600}/>
+              width={1000} height={500}/>
     );
   }
 }
