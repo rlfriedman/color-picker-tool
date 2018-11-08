@@ -76,9 +76,9 @@ class App extends Component {
   componentDidUpdate(prevProps, prevState) {
     // This should not be called always but for now need to to leave the
     // url after the palette is reset.
-    //if (prevState.imageUrl !== this.state.imageUrl) {
+    if (prevState.imageUrl !== this.state.imageUrl) {
       this.updateImageUrlParam();
-    //}
+    }
   }
 
   componentWillMount() {
@@ -135,13 +135,14 @@ class App extends Component {
   }
 
   resetPallete() {
+    window.history.replaceState(null, null, window.location.pathname);
     this.setState({
       totalSwabs: 1,
       currentSwab: 0,
       isActive: true,
       colorSwabs: ["empty"],
     });
-    window.history.replaceState(null, null, window.location.pathname);
+    this.updateImageUrlParam();
   }
 
   handleColorMove(pixel) {
