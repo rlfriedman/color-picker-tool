@@ -94,12 +94,13 @@ $number-max-swabs: 5;
 }
 
 .random-image-button {
-  align-self: center;
-  margin-right: 20px;
+  margin-left: 20px;
 }
 
 .control-container {
-  display: flex;
-  justify-content: center;
   margin-top: 20px; 
+}
+
+.copy-button {
+  float: right;
 }

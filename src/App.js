@@ -46,6 +46,15 @@ class App extends Component {
                         handleSwabClick={(swabIndex) => this.handleSwabClick(swabIndex)}>
           </ColorPalette>
           <div className="control-container">
+            <TextField
+              outlined
+              label='Update Image URL'
+            >
+            <Input
+              value={this.state.textFieldValue}
+              onKeyPress={(e) => this.handleInputKeypress(e)}
+              onChange={(e) => this.setState({textFieldValue: e.target.value})}/>
+            </TextField>
             <Button
               outlined
               className='random-image-button'
@@ -60,22 +69,13 @@ class App extends Component {
             </Button>
             <Button
               outlined
-              className='random-image-button'
+              className='copy-button'
               onClick={() => {
                 // Probably only works in latest versions of Chrome
                 navigator.clipboard.writeText(window.location.href);
               }}>
-              Copy URL
+              Copy Page URL
             </Button>
-            <TextField
-              outlined
-              label='Update Image URL'
-            >
-            <Input
-              value={this.state.textFieldValue}
-              onKeyPress={(e) => this.handleInputKeypress(e)}
-              onChange={(e) => this.setState({textFieldValue: e.target.value})}/>
-            </TextField>
           </div>
         </div>
       </div>
