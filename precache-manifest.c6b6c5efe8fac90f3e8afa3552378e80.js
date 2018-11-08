@@ -36,7 +36,7 @@ self.__precacheManifest = [
     "url": "/color-picker-tool/static/css/main.23e272bf.chunk.css"
   },
   {
-    "revision": "f3f0e874c80ce059cb2ce5e432ba6ee8",
+    "revision": "255c6b8cd185e58da90be918482a1957",
     "url": "/color-picker-tool/index.html"
   }
 ];
