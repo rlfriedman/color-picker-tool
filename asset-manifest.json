@@ -1,7 +1,7 @@
 {
-  "main.css": "/color-picker-tool/static/css/main.d8945f88.chunk.css",
-  "main.js": "/color-picker-tool/static/js/main.fcea9402.chunk.js",
-  "main.js.map": "/color-picker-tool/static/js/main.fcea9402.chunk.js.map",
+  "main.css": "/color-picker-tool/static/css/main.dd6e4f09.chunk.css",
+  "main.js": "/color-picker-tool/static/js/main.ef562675.chunk.js",
+  "main.js.map": "/color-picker-tool/static/js/main.ef562675.chunk.js.map",
   "static/js/1.18ba569a.chunk.js": "/color-picker-tool/static/js/1.18ba569a.chunk.js",
   "static/js/1.18ba569a.chunk.js.map": "/color-picker-tool/static/js/1.18ba569a.chunk.js.map",
   "runtime~main.js": "/color-picker-tool/static/js/runtime~main.79e784c1.js",
@@ -11,8 +11,8 @@
   "static/media/island.jpg": "/color-picker-tool/static/media/island.a6b028d2.jpg",
   "static/media/logo.svg": "/color-picker-tool/static/media/logo.5d5d9eef.svg",
   "static/media/flowers.jpg": "/color-picker-tool/static/media/flowers.5a0c1aa2.jpg",
-  "static/css/main.d8945f88.chunk.css.map": "/color-picker-tool/static/css/main.d8945f88.chunk.css.map",
+  "static/css/main.dd6e4f09.chunk.css.map": "/color-picker-tool/static/css/main.dd6e4f09.chunk.css.map",
   "index.html": "/color-picker-tool/index.html",
-  "precache-manifest.e335d100df4b8888790fe265c3a6b766.js": "/color-picker-tool/precache-manifest.e335d100df4b8888790fe265c3a6b766.js",
+  "precache-manifest.95ab3d6c9f14a048e6f923c5879768e2.js": "/color-picker-tool/precache-manifest.95ab3d6c9f14a048e6f923c5879768e2.js",
   "service-worker.js": "/color-picker-tool/service-worker.js"
 }
