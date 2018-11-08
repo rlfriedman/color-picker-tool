@@ -1,4 +1,8 @@
-Made for a hackathon in a short time frame. Try it out at: https://rlfriedman.github.io/color-picker-tool/
+Made for a hackathon in a short time frame. Create and share color boards based on images. Try it out at: https://rlfriedman.github.io/color-picker-tool/
+
+Click on the image to select a color. To change an existing color swab, click on the swab and then select a color from the image. To share, simply share the URL!
+
+You can load images from publicly accessible image URLs by pasting them into the textfield and hitting enter. Try some from Imgur or Wikipedia!
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
