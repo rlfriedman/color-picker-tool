@@ -95,12 +95,27 @@ $number-max-swabs: 5;
 
 .random-image-button {
   margin-left: 20px;
+  margin-top: auto;
 }
 
 .control-container {
+  display: flex;
   margin-top: 20px; 
 }
 
 .copy-button {
-  float: right;
+  margin-left: auto;
+  margin-top: auto;
+}
+
+.highlighted-examples {
+  line-height: 90px;
+  font-family: Roboto,sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.highlighted-examples a {
+  margin-left: 15px;
+
 }

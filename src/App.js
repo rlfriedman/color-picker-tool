@@ -35,7 +35,8 @@ class App extends Component {
         <div className="color-tool-container">
           <ImageCanvas colorMove={(pixel) => this.handleColorMove(pixel)}
                       colorSelected={(hex) => this.handleColorSelected(hex)} 
-                      imageUrl={this.state.imageUrl}>
+                      imageUrl={this.state.imageUrl}
+                      handleImageLoaded={() => this.updateImageUrlParam()}>
           </ImageCanvas>
           <ColorPalette colorSwabs={this.state.colorSwabs}
                         currentSwab={this.state.currentSwab}
@@ -48,6 +49,7 @@ class App extends Component {
           <div className="control-container">
             <TextField
               outlined
+              dense
               label='Update Image URL'
             >
             <Input
@@ -77,6 +79,13 @@ class App extends Component {
               Copy Page URL
             </Button>
           </div>
+          <div className="highlighted-examples">
+            <span>Examples:</span>
+            <a href="https://rlfriedman.github.io/color-picker-tool/?url=https%253A%252F%252Fi.imgur.com%252Fqbofwvx.jpg&p0=ec6762&p1=acd174&p2=3a6295&p3=514e63&p4=91baac">Chihiro</a>
+            <a href="https://rlfriedman.github.io/color-picker-tool/?url=https%253A%252F%252Fimages.unsplash.com%252Fphoto-1504109586057-7a2ae83d1338%253Fixlib%253Drb-0.3.5%2526ixid%253DeyJhcHBfaWQiOjEyMDd9%2526s%253Db66e9d835de3873a86d1cec996a1af06%2526auto%253Dformat%2526fit%253Dcrop%2526w%253D2690%2526q%253D80&p0=3f7f99&p1=a1b5c8&p2=d1654e&p3=39a1a2&p4=658ea7">Japan</a>
+            <a href="https://rlfriedman.github.io/color-picker-tool/?url=https%253A%252F%252Fimages.unsplash.com%252Fphoto-1508531321667-dabf317cc382%253Fixlib%253Drb-0.3.5%2526ixid%253DeyJhcHBfaWQiOjEyMDd9%2526s%253Da6181571393c9907522c562c755812b0%2526auto%253Dformat%2526fit%253Dcrop%2526w%253D2850%2526q%253D80&p0=c7ca03&p1=fdb041&p2=a55e64&p3=c40529&p4=e8c103">Leaf Beast</a>
+            <a href="https://rlfriedman.github.io/color-picker-tool/?url=https%253A%252F%252Fimages.unsplash.com%252Fphoto-1532627744246-d88dcbcf9541%253Fixlib%253Drb-0.3.5%2526ixid%253DeyJhcHBfaWQiOjEyMDd9%2526s%253D3fc9ea42e8dde9b4930bf32e9db0be08%2526auto%253Dformat%2526fit%253Dcrop%2526w%253D1952%2526q%253D80&p0=d9e3ed&p1=b9c3cd&p2=7e4062&p3=bdd4ef&p4=e5e8ee">Snow Beast</a>
+          </div>
         </div>
       </div>
     );
@@ -86,7 +95,7 @@ class App extends Component {
     // This should not be called always but for now need to to leave the
     // url after the palette is reset.
     if (prevState.imageUrl !== this.state.imageUrl) {
-      this.updateImageUrlParam();
+      //this.updateImageUrlParam();
     }
   }
 
@@ -112,7 +121,7 @@ class App extends Component {
     }
     if (paletteColors.length) {
       this.setState({colorSwabs: paletteColors,
-        totalSwabs: paletteColors.length,
+        totalSwabs: paletteColors.length < this.state.maxSwabs ? paletteColors.length + 1 : paletteColors.length,
         currentSwab: this.state.maxSwabs > paletteColors.length ? paletteColors.length : this.state.maxSwabs - 1,
         isActive: this.state.maxSwabs !== paletteColors.length,
         
@@ -224,7 +233,13 @@ class ImageCanvas extends Component {
       } = resizeImageToFitCanvas(image, canvasElement);
 
       ctx.drawImage(image, offsetX, offsetY, width, height);
+      this.props.handleImageLoaded();
     }
+
+    image.onerror = () => {
+      alert('Sorry for the alert, please try another image URL. Try a photo from imgur or the random button!');
+    }
+
     image.crossOrigin = "Anonymous";
     image.src = imageUrl;
   }
