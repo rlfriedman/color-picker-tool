@@ -6,6 +6,7 @@ import parrots from './images/parrots.jpg';
 import island from './images/island.jpg';
 import logo from './logo.svg';
 import withRipple from '@material/react-ripple';
+import TextField, {HelperText, Input} from '@material/react-text-field';
 
 import './App.scss';
 import { debug } from 'util';
@@ -24,6 +25,7 @@ class App extends Component {
     totalSwabs: 1,
     maxSwabs: 5,
     isActive: true,
+    textFieldValue: '',
   };
 
   render() {
@@ -42,21 +44,43 @@ class App extends Component {
                         maxSwabs={this.state.maxSwabs}
                         handleSwabClick={(swabIndex) => this.handleSwabClick(swabIndex)}>
           </ColorPalette>
-          <Button
-            outlined
-            className='random-image-button'
-            onClick={() => {
-              this.setState({
-                imageUrl: images[(this.state.currentImageIndex + 1) % images.length],
-                currentImageIndex: this.state.currentImageIndex + 1,
-              });
-              this.resetPallete();
-            }}>
-            Random Image
-          </Button>
+          <div className="control-container">
+            <Button
+              outlined
+              className='random-image-button'
+              onClick={() => {
+                this.setState({
+                  imageUrl: images[(this.state.currentImageIndex + 1) % images.length],
+                  currentImageIndex: this.state.currentImageIndex + 1,
+                });
+                this.resetPallete();
+              }}>
+              Random Image
+            </Button>
+            <TextField
+              outlined
+              label='Update Image URL'
+            >
+            <Input
+              value={this.state.textFieldValue}
+              onKeyPress={(e) => this.handleInputKeypress(e)}
+              onChange={(e) => this.setState({textFieldValue: e.target.value})}/>
+            </TextField>
+          </div>
         </div>
       </div>
     );
+  }
+
+  handleInputKeypress(e) {
+    if (e.key === 'Enter') {
+      console.log(this.state.textFieldValue);
+      this.setState({
+        imageUrl: this.state.textFieldValue,
+        textFieldValue: '',
+      });
+      this.resetPallete();
+    }
   }
 
   resetPallete() {
@@ -138,6 +162,7 @@ class ImageCanvas extends Component {
 
       ctx.drawImage(image, offsetX, offsetY, width, height);
     }
+    image.crossOrigin = "Anonymous";
     image.src = imageUrl;
   }
 
@@ -177,13 +202,6 @@ class ImageCanvas extends Component {
 class ColorPalette extends Component {
   colorSwabEl = React.createRef();
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      colorSwabs: ["#FFFFFF"],
-    };
-  }
-
   componentDidUpdate(prevProps) {
     if (prevProps.hex !== this.props.hex) {
       this.updateColor();
@@ -221,14 +239,6 @@ class ColorPalette extends Component {
 class ColorSwab extends Component {
   colorSwabEl = React.createRef();
 
-  constructor(props) {
-    super(props);
-    this.state = {
-      hasSetColor: false,
-      hasColor: false,
-    };
-  }
-
   componentDidUpdate(prevProps) {
     if (prevProps.hex !== this.props.hex) {
       this.updateColor();
@@ -240,17 +250,8 @@ class ColorSwab extends Component {
     this.props.initRipple(this.colorSwabEl.current);
   }
 
-  componentWillUnmount() {
-    console.log('unmount');
-    this.setState({hasColor: false});
-  }
-
   updateColor() {
     const colorSwabEl = this.colorSwabEl.current;
-    // Remove the no-color class when the color has been set.
-    this.setState({
-      hasColor: true,
-    });
     colorSwabEl.style.backgroundColor = this.props.hex;
 
     //const textColor = this.decideTextColor(this.props.color);

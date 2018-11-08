@@ -1,6 +1,7 @@
 
 @import "@material/react-button/index.scss";
 @import '@material/react-ripple/index.scss';
+@import '@material/react-text-field/index.scss';
 
 //@import "./react-button-overrides";
 
@@ -69,7 +70,7 @@ $number-max-swabs: 5;
 }
 
 .color-swab.no-color {
-  border: dashed;
+  border: dashed 5px;
   border-color:#dedede;
 }
 
@@ -93,5 +94,12 @@ $number-max-swabs: 5;
 }
 
 .random-image-button {
-  margin-top: 20px;
+  align-self: center;
+  margin-right: 10px;
+}
+
+.control-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px; 
 }
