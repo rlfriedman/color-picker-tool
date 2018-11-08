@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/color-picker-tool/precache-manifest.a577d5c190dc34cec2c08d902bce5399.js"
+  "/color-picker-tool/precache-manifest.8d0e7fd31a6148bdf6c08fe9400696d8.js"
 );
 
 workbox.clientsClaim();

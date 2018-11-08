@@ -24,19 +24,19 @@ self.__precacheManifest = [
     "url": "/color-picker-tool/static/js/runtime~main.79e784c1.js"
   },
   {
-    "revision": "f1bb76ebbbba955e6bf7",
-    "url": "/color-picker-tool/static/js/main.f1bb76eb.chunk.js"
+    "revision": "0354e87cfbc39e9fcc13",
+    "url": "/color-picker-tool/static/js/main.0354e87c.chunk.js"
   },
   {
-    "revision": "b969c0d1433ea42d3e18",
-    "url": "/color-picker-tool/static/js/1.b969c0d1.chunk.js"
+    "revision": "18ba569a58e11de39d9c",
+    "url": "/color-picker-tool/static/js/1.18ba569a.chunk.js"
   },
   {
-    "revision": "f1bb76ebbbba955e6bf7",
-    "url": "/color-picker-tool/static/css/main.23e272bf.chunk.css"
+    "revision": "0354e87cfbc39e9fcc13",
+    "url": "/color-picker-tool/static/css/main.f7bbb9b0.chunk.css"
   },
   {
-    "revision": "7b68bb0a297550b850c526974973ca67",
+    "revision": "34f6a280fe92e55fc8861052cb05128a",
     "url": "/color-picker-tool/index.html"
   }
 ];
