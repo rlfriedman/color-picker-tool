@@ -1,14 +1,21 @@
 import React, {Component} from 'react';
 import Button from '@material/react-button';
 import sunset from './images/sunset.jpg';
+import flowers from './images/flowers.jpg';
+import parrots from './images/parrots.jpg';
+import island from './images/island.jpg';
 import logo from './logo.svg';
 import withRipple from '@material/react-ripple';
 
 import './App.scss';
+import { debug } from 'util';
+
+const images = [sunset, flowers, parrots, island];
 
 class App extends Component {
   state = {
-    imageUrl: sunset,
+    imageUrl: images[0],
+    currentImageIndex: 0,
     color: null,
     hex: null,
     tempHex: null,
@@ -21,13 +28,6 @@ class App extends Component {
   render() {
     return (
       <div className="app-container">
-{/*         <Button
-          raised
-          className='button-alternate'
-          onClick={() => this.setState({imageUrl: logo})}
-        >
-          Change Image!
-        </Button> */}
         <div className="color-tool-container">
           <ImageCanvas colorMove={(pixel) => this.handleColorMove(pixel)}
                       colorSelected={(hex) => this.handleColorSelected(hex)} 
@@ -40,9 +40,29 @@ class App extends Component {
                         maxSwabs={this.state.maxSwabs}
                         handleSwabClick={(swabIndex) => this.handleSwabClick(swabIndex)}>
           </ColorPalette>
+          <Button
+            outlined
+            className='random-image-button'
+            onClick={() => {
+              this.setState({
+                imageUrl: images[(this.state.currentImageIndex + 1) % images.length],
+                currentImageIndex: this.state.currentImageIndex + 1,
+              });
+              this.clearPalette();
+            }}>
+            Random Image
+          </Button>
         </div>
       </div>
     );
+  }
+
+  clearPalette() {
+    this.setState({
+      totalSwabs: 1,
+      currentSwab: 0,
+      isActive: true,
+    })
   }
 
   handleColorMove(pixel) {
@@ -54,6 +74,7 @@ class App extends Component {
   }
 
   handleColorSelected(pixel) {
+    console.log(pixel);
     if (!this.state.isActive) {
       return;
     }
@@ -112,7 +133,7 @@ class ImageCanvas extends Component {
         height,
       } = resizeImageToFitCanvas(image, canvasElement);
 
-      ctx.drawImage(image, offsetX, offsetY, width, height);  
+      ctx.drawImage(image, offsetX, offsetY, width, height);
     }
     image.src = imageUrl;
   }
@@ -156,7 +177,7 @@ class ColorPalette extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      colorSwabs: ["#F5F5F5"],
+      colorSwabs: ["#FFFFFF"],
     };
   }
 
@@ -175,11 +196,11 @@ class ColorPalette extends Component {
     this.setState({colorSwabs: swabs});
   }
 
-  renderSwab() {
+  /*renderSwab() {
     const swabs = this.state.colorSwabs.slice();
     swabs.push(<RippleColorSwab hex={this.props.hex} key={this.state.colorSwabs.length} />);
     this.setState({colorSwabs: swabs});
-  }
+  } */
 
   render() {
     const swabs = [];
@@ -201,6 +222,7 @@ class ColorSwab extends Component {
     super(props);
     this.state = {
       hasSetColor: false,
+      hasColor: false,
     };
   }
 
@@ -217,6 +239,10 @@ class ColorSwab extends Component {
 
   updateColor() {
     const colorSwabEl = this.colorSwabEl.current;
+    // Remove the no-color class when the color has been set.
+    this.setState({
+      hasColor: true,
+    });
     colorSwabEl.style.backgroundColor = this.props.hex;
 
     //const textColor = this.decideTextColor(this.props.color);
@@ -235,17 +261,13 @@ class ColorSwab extends Component {
   render() {
     const {
       className = '',
-      // You must call `initRipple` from the root element's ref. This attaches the ripple
-      // to the element.
       initRipple,
-      // include `unbounded` to remove warnings when passing `otherProps` to the
-      // root element.
       unbounded,
       handleSwabClick,
       ...otherProps
     } = this.props;
 
-    const classes = `color-swab ${className}`;
+    const classes = `color-swab ${this.state.hasColor ? '' : 'no-color'} ${className}`;
 
     return (
       <div ref={this.colorSwabEl} className={classes}
@@ -263,7 +285,8 @@ class ColorSwab extends Component {
 const RippleColorSwab = withRipple(ColorSwab);
 
 function rgbToHex(imageData) {
-  return '#' + ((imageData[0] << 16) | (imageData[1] << 8) | imageData[2]).toString(16);
+  const rgb = ((imageData[0] << 16) | (imageData[1] << 8) | imageData[2]);
+  return '#' + (0x1000000 + rgb).toString(16).slice(1);
 }
 
 function resizeImageToFitCanvas(image, canvas) {

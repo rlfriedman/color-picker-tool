@@ -4,6 +4,10 @@
 
 //@import "./react-button-overrides";
 
+$canvas-width: 800px;
+$swab-margin: 10px;
+$number-max-swabs: 5;
+
 .App {
   text-align: center;
 }
@@ -38,7 +42,7 @@
 }
 
 .color-swab {
-  width: 200px;
+  width: ($canvas-width - (($number-max-swabs - 1) * $swab-margin)) / $number-max-swabs;
   height: 200px;
   display: flex;
   justify-content: center;
@@ -47,6 +51,8 @@
   @include mdc-ripple-radius-bounded;
   @include mdc-states;
   overflow: hidden;
+  box-sizing: border-box;
+  transition: background-color .03s;
 }
 
 .color-swab-text {
@@ -62,19 +68,30 @@
   opacity: 1;
 }
 
+.color-swab.no-color {
+  border: dashed;
+  border-color:#dedede;
+}
+
 .color-palette-container {
   margin-top: 10px;
   display: flex;
 }
 
 .color-palette-container .color-swab:not(:last-child) {
-  margin-right: 10px;
+  margin-right: $swab-margin;
 }
 
 .app-container {
   margin: 20px;
+  display: flex;
+  justify-content: center;
 }
 
 .color-tool-container {
-  width: 800px;
+  width: $canvas-width;
+}
+
+.random-image-button {
+  margin-top: 20px;
 }
